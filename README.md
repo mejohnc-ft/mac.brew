@@ -32,7 +32,9 @@ bash ~/mac-setup/bootstrap.sh
 9. **Dotfile symlinks** — `.zshrc`, `.gitconfig`, `.config/zed`, `.config/gh`
 10. **AI config restore** — `rsync --ignore-existing` from `configs/ai/`
 11. **Dock pin** via `dockutil`
-12. **macOS UI defaults** — `macos.sh`
+12. **macOS UI + power defaults** — `macos.sh` (UI) and `power.sh`
+    (Moderate `pmset` preset: 30 min battery sleep, never sleep on AC,
+    long-running tasks survive idle, SSH keeps Mac awake)
 13. **Permission grants (interactive)** — per-permission deep-links to System
     Settings → Privacy & Security, with `gum confirm` between each:
     Accessibility, Screen Recording, Input Monitoring, Full Disk Access.

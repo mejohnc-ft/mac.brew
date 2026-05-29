@@ -282,11 +282,13 @@ else
   warn "dockutil not found — skipping"
 fi
 
-# ─── Step 12: macOS UI defaults ──────────────────────────────────
-step "12/14" "macOS UI defaults"
+# ─── Step 12: macOS UI + power defaults ──────────────────────────
+step "12/14" "macOS UI + power defaults"
 run_spin "Applying Dock / Finder / keyboard / screenshots / Safari…" \
   bash "$REPO_DIR/macos.sh"
-ok "macOS defaults applied"
+run_spin "Applying liberal pmset sleep settings (uses cached sudo)…" \
+  bash "$REPO_DIR/power.sh"
+ok "macOS + power defaults applied"
 
 # ─── Step 13: Permission grants (interactive) ────────────────────
 step "13/14" "Permission grants (interactive — each opens System Settings)"
