@@ -29,6 +29,9 @@ brew "supabase/tap/supabase"
 # App Store CLI
 brew "mas"
 
+# Dock layout
+brew "dockutil"
+
 # ─── Casks ──────────────────────────────────
 # Productivity / utilities
 cask "1password"
@@ -50,6 +53,7 @@ cask "discord"
 cask "visual-studio-code"
 cask "docker-desktop"
 cask "powershell"
+cask "warp"
 
 # Networking
 cask "tailscale-app"

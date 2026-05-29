@@ -1,0 +1,10 @@
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[user]
+	name = John Christensen
+	email = 175576479+mejohnc-ft@users.noreply.github.com
+	useConfigOnly = true
