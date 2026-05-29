@@ -1,4 +1,8 @@
-# ~/Brewfile — personal machine baseline
+# ~/Brewfile — personal machine baseline (formulae + casks)
+#
+# App Store apps are in a separate file: Brewfile.appstore
+# That file is run conditionally during bootstrap.sh only after
+# Apple ID + App Store sign-in is confirmed.
 
 tap "supabase/tap"
 
@@ -26,7 +30,7 @@ brew "postgresql@16"
 brew "postgresql@18"
 brew "supabase/tap/supabase"
 
-# App Store CLI
+# App Store CLI (App Store *apps* live in Brewfile.appstore)
 brew "mas"
 
 # Dock layout
@@ -38,6 +42,7 @@ brew "gum"
 # ─── Casks ──────────────────────────────────
 # Productivity / utilities
 cask "1password"
+cask "1password-cli"
 cask "appcleaner"
 cask "bettertouchtool"
 cask "obsidian"
@@ -63,16 +68,3 @@ cask "tailscale-app"
 
 # Dictation
 cask "superwhisper"
-
-# ─── App Store (requires manual sign-in first) ──
-mas "Dark Reader for Safari", id: 1438243180
-mas "Drafts",                 id: 1435957248
-mas "Infuse",                 id: 1136220934
-mas "Keynote",                id: 409183694
-mas "Numbers",                id: 409203825
-mas "Pages",                  id: 409201541
-mas "Paste",                  id: 967805235
-mas "PCalc",                  id: 403504866
-mas "Pixelmator Pro",         id: 1289583905
-mas "Reeder",                 id: 6475002485
-mas "TextSniper",             id: 1528890965

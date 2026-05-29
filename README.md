@@ -14,27 +14,39 @@ gh repo clone mejohnc-ft/mac.brew ~/mac-setup
 bash ~/mac-setup/bootstrap.sh
 ```
 
-`bootstrap.sh` runs in eight steps, styled with [`gum`](https://github.com/charmbracelet/gum):
-1. Install Homebrew
-2. `brew bundle` — formulae, casks, App Store apps (via `mas`), `gum`,
-   `dockutil`
-3. Vendor AI CLIs — Claude Code, Factory `droid`, Cursor, `uv`; symlink
-   OpenAI Codex from `Codex.app` onto PATH
-4. Symlink dotfiles from `configs/` into `$HOME`
-5. Restore AI tool configs — `~/.claude` and `~/.codex` populated from
-   `configs/ai/` with `rsync --ignore-existing`
-6. Pin Dock apps with `dockutil`
-7. Apply macOS UI/UX defaults
-8. **Agent review (optional)** — `gum confirm` offers to run Claude Code,
-   which verifies brew bundle status, AI config presence, Dock layout,
-   and key macOS defaults, then prints a markdown ✓/⚠/✗ report.
+`bootstrap.sh` runs in fourteen steps, styled with [`gum`](https://github.com/charmbracelet/gum):
+
+1. **System check** — macOS version, user, disk available
+2. **Homebrew** — install if missing
+3. **brew bundle (no App Store)** — formulae + casks only (`Brewfile`)
+4. **Apple ID sign-in** — deep-link to System Settings; `gum confirm`. Skippable.
+5. **App Store apps** — `brew bundle --file=Brewfile.appstore` only if step 4
+   was confirmed and `mas account` sees a session. Otherwise quietly skipped
+   (no eleven failed sign-in prompts in a row).
+6. **1Password unlock** — open 1Password, prompt for Touch ID + CLI integration.
+   Sets the stage for future SSH-key / Tailscale-auth-key fetching.
+7. **Vendor AI CLIs install** — Claude Code, Factory `droid`, Cursor, `uv`;
+   symlink OpenAI Codex from `Codex.app` onto PATH.
+8. **AI CLI auth** — per-tool `gum confirm`; if accepted, launches the tool
+   interactively for browser-based sign-in.
+9. **Dotfile symlinks** — `.zshrc`, `.gitconfig`, `.config/zed`, `.config/gh`
+10. **AI config restore** — `rsync --ignore-existing` from `configs/ai/`
+11. **Dock pin** via `dockutil`
+12. **macOS UI defaults** — `macos.sh`
+13. **Permission grants (interactive)** — per-permission deep-links to System
+    Settings → Privacy & Security, with `gum confirm` between each:
+    Accessibility, Screen Recording, Input Monitoring, Full Disk Access.
+14. **Agent review (optional)** — `gum confirm` → Claude Code verifies brew
+    bundle status (both files), AI configs, dotfile symlinks, Dock layout,
+    macOS defaults, AI CLI auth, prints a markdown ✓/⚠/✗ report.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `Brewfile` | Formulae, casks, `mas` App Store entries, `dockutil` |
-| `bootstrap.sh` | One-shot installer |
+| `Brewfile` | Formulae + casks (no App Store apps) |
+| `Brewfile.appstore` | App Store apps — installed conditionally on Apple ID sign-in |
+| `bootstrap.sh` | One-shot installer, 14 steps |
 | `macos.sh` | macOS UI/UX defaults (Dock, Finder, hot corners, trackpad, keyboard, screenshots, Safari, animations, sound) |
 | `configs/` | Safe dotfiles + AI tool configs — never contains tokens or secrets |
 | `configs/ai/claude/` | Claude Code settings, hooks, agents, skills, plugin manifest |
@@ -66,6 +78,7 @@ These apps sync via cloud accounts (no need to script):
 ```sh
 brew update && brew upgrade
 brew bundle check   --file=~/mac-setup/Brewfile
+brew bundle check   --file=~/mac-setup/Brewfile.appstore
 brew bundle cleanup --file=~/mac-setup/Brewfile
 ```
 

@@ -1,0 +1,20 @@
+# Brewfile.appstore — Mac App Store apps only.
+#
+# Run AFTER signing into the Mac App Store:
+#   brew bundle --file=Brewfile.appstore
+#
+# bootstrap.sh runs this conditionally during step 5, only when Apple ID +
+# App Store sign-in is confirmed, so a declined sign-in doesn't produce
+# eleven sign-in prompts in a row.
+
+mas "Dark Reader for Safari", id: 1438243180
+mas "Drafts",                 id: 1435957248
+mas "Infuse",                 id: 1136220934
+mas "Keynote",                id: 409183694
+mas "Numbers",                id: 409203825
+mas "Pages",                  id: 409201541
+mas "Paste",                  id: 967805235
+mas "PCalc",                  id: 403504866
+mas "Pixelmator Pro",         id: 1289583905
+mas "Reeder",                 id: 6475002485
+mas "TextSniper",             id: 1528890965

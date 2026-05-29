@@ -12,10 +12,10 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# ─────────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────────
 # Styling helpers — fall back to plain echo if gum isn't installed
-# (gum gets installed during step 2; steps 1-2 are plain text)
-# ─────────────────────────────────────────────────────────────────
+# (gum gets installed during step 3; earlier steps use plain output)
+# ──────────────────────────────────────────────────────────────────
 banner() {
   if command -v gum >/dev/null 2>&1; then
     gum style --border double --margin "1 2" --padding "1 4" \
@@ -38,27 +38,17 @@ step() {
   fi
 }
 
-ok() {
-  if command -v gum >/dev/null 2>&1; then
-    gum style --foreground 42 "  ✓ $*"
-  else
-    echo "  ✓ $*"
-  fi
-}
+ok()   { if command -v gum >/dev/null 2>&1; then gum style --foreground 42  "  ✓ $*"; else echo "  ✓ $*"; fi; }
+warn() { if command -v gum >/dev/null 2>&1; then gum style --foreground 214 "  ⚠ $*"; else echo "  ⚠ $*"; fi; }
+info() { if command -v gum >/dev/null 2>&1; then gum style --foreground 244 "  ⓘ $*"; else echo "  ⓘ $*"; fi; }
 
-warn() {
+ask_yes() {
+  local prompt="$1"
   if command -v gum >/dev/null 2>&1; then
-    gum style --foreground 214 "  ⚠ $*"
+    gum confirm "$prompt"
   else
-    echo "  ⚠ $*"
-  fi
-}
-
-info() {
-  if command -v gum >/dev/null 2>&1; then
-    gum style --foreground 244 "  ⓘ $*"
-  else
-    echo "  ⓘ $*"
+    read -r -p "$prompt [y/N] " ans
+    [[ "$ans" =~ ^[Yy]$ ]]
   fi
 }
 
@@ -72,23 +62,91 @@ run_spin() {
   fi
 }
 
-# ─────────────────────────────────────────────────────────────────
+deep_link() {
+  open "$1" >/dev/null 2>&1 || true
+  sleep 1  # let the pane register before user looks
+}
+
+# ──────────────────────────────────────────────────────────────────
 
 banner "Mac Setup" "Personal baseline restoration" "mejohnc-ft/mac.brew"
 
-step "1/8" "Homebrew"
+# ─── Step 1: System check ─────────────────────────────────────────
+step "1/14" "System check"
+info "macOS:   $(sw_vers -productVersion)"
+info "User:    $USER  •  Home: $HOME"
+info "Disk:    $(df -h "$HOME" | awk 'NR==2 {print $4}') available"
+
+# ─── Step 2: Homebrew ─────────────────────────────────────────────
+step "2/14" "Homebrew"
 if ! command -v brew >/dev/null 2>&1; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 ok "Homebrew ready"
 
-step "2/8" "brew bundle — formulae, casks, App Store"
+# ─── Step 3: brew bundle (no App Store apps yet) ─────────────────
+step "3/14" "brew bundle — formulae + casks (no App Store apps yet)"
 brew bundle --file="$REPO_DIR/Brewfile"
-ok "brew bundle complete"
+ok "Core packages installed (gum, 1Password, dockutil, AI casks, …)"
 
-# From here on, gum is installed and available
-step "3/8" "Vendor AI CLIs"
+# ─── Step 4: Apple ID sign-in ────────────────────────────────────
+step "4/14" "Apple ID sign-in"
+APPLE_OK=0
+if ask_yes "Open System Settings to sign into Apple ID? (needed for App Store + iCloud)"; then
+  deep_link "x-apple.systempreferences:com.apple.preferences.AppleIDPrefPane"
+  if ask_yes "Apple ID signed in?"; then
+    APPLE_OK=1
+    ok "Apple ID confirmed"
+  else
+    warn "Apple ID skipped — App Store apps will be skipped"
+  fi
+else
+  warn "Apple ID skipped — App Store apps will be skipped"
+fi
+
+# ─── Step 5: App Store apps via mas ──────────────────────────────
+step "5/14" "App Store apps"
+if [ "$APPLE_OK" -eq 1 ]; then
+  if mas account >/dev/null 2>&1; then
+    ok "mas sees the App Store session"
+  else
+    info "mas can't see a session yet. Opening App Store app…"
+    deep_link "macappstore://"
+    if ! ask_yes "Signed into the App Store app?"; then
+      warn "App Store skipped — run later: brew bundle --file=$REPO_DIR/Brewfile.appstore"
+      APPLE_OK=0
+    fi
+  fi
+
+  if [ "$APPLE_OK" -eq 1 ]; then
+    brew bundle --file="$REPO_DIR/Brewfile.appstore" || \
+      warn "Some App Store installs failed (re-run later if needed)"
+    ok "App Store apps installed"
+  fi
+else
+  info "Skipping App Store apps. Run later when ready:"
+  info "  brew bundle --file=$REPO_DIR/Brewfile.appstore"
+fi
+
+# ─── Step 6: 1Password unlock ────────────────────────────────────
+step "6/14" "1Password unlock"
+if [ -d /Applications/1Password.app ]; then
+  if ask_yes "Open 1Password to sign in and enable Touch ID + CLI?"; then
+    open -a 1Password
+    info "In 1Password: Settings → Developer → enable 'Integrate with 1Password CLI'"
+    info "Also: Settings → Security → Touch ID"
+    ask_yes "1Password unlocked and CLI integration enabled?" || \
+      warn "1Password not fully set up — future SSH key / Tailscale auth steps will need manual handling"
+  else
+    info "1Password unlock skipped — revisit later for SSH keys / app passwords"
+  fi
+else
+  warn "1Password.app not installed (cask should have provided it in step 3)"
+fi
+
+# ─── Step 7: Vendor AI CLIs (install) ────────────────────────────
+step "7/14" "Install vendor AI CLIs"
 mkdir -p "$HOME/.local/bin"
 
 if ! command -v claude >/dev/null 2>&1; then
@@ -102,7 +160,7 @@ fi
 if ! command -v cursor-agent >/dev/null 2>&1; then
   run_spin "Installing cursor-agent…" \
     bash -c "curl -fsSL https://cursor.com/install | bash" || \
-    warn "Cursor install URL may have changed — check cursor.com"
+    warn "Cursor install URL may have changed"
 fi
 if ! command -v uv >/dev/null 2>&1; then
   run_spin "Installing uv…" \
@@ -114,9 +172,31 @@ if [ -x "$CODEX_APP" ] && [ ! -e "$HOME/.local/bin/codex" ]; then
   ln -s "$CODEX_APP" "$HOME/.local/bin/codex"
   ok "linked Codex CLI from Codex.app"
 fi
-ok "AI CLIs ready"
+ok "AI CLIs installed"
 
-step "4/8" "Symlink personal dotfiles"
+# Make them available to this shell for step 8
+export PATH="$HOME/.local/bin:$PATH"
+
+# ─── Step 8: AI CLI auth (interactive per tool) ──────────────────
+step "8/14" "Authorize AI CLIs (each launches its own browser flow)"
+authorize() {
+  local name="$1" cmd="$2"
+  command -v "$cmd" >/dev/null 2>&1 || { warn "$name not installed, skipping"; return; }
+  if ask_yes "Launch $name now to sign in? (browser opens for auth)"; then
+    info "After the browser auth completes, return to this terminal and exit the CLI (Ctrl+D or /exit)."
+    "$cmd" || true  # tool's own exit code, not a failure for us
+    ok "$name auth flow finished"
+  else
+    info "Skipped — run '$cmd' manually later to authorize"
+  fi
+}
+authorize "Claude Code"   claude
+authorize "Factory droid" droid
+authorize "OpenAI Codex"  codex
+authorize "Cursor agent"  cursor-agent
+
+# ─── Step 9: Symlink personal dotfiles ───────────────────────────
+step "9/14" "Symlink personal dotfiles"
 link_config() {
   local src="$1" dest="$2"
   if [ -e "$dest" ] && [ ! -L "$dest" ]; then
@@ -127,25 +207,26 @@ link_config() {
   ln -sfn "$src" "$dest"
   ok "$(basename "$dest") → $src"
 }
-
 link_config "$REPO_DIR/configs/zshrc"             "$HOME/.zshrc"
 link_config "$REPO_DIR/configs/gitconfig"         "$HOME/.gitconfig"
 link_config "$REPO_DIR/configs/zed/settings.json" "$HOME/.config/zed/settings.json"
 link_config "$REPO_DIR/configs/gh/config.yml"     "$HOME/.config/gh/config.yml"
 
-step "5/8" "Restore AI tool configs"
+# ─── Step 10: Restore AI tool configs ────────────────────────────
+step "10/14" "Restore AI tool configs"
 mkdir -p "$HOME/.claude" "$HOME/.codex"
 run_spin "Syncing ~/.claude (skills, agents, hooks, settings)…" \
   rsync -a --ignore-existing "$REPO_DIR/configs/ai/claude/" "$HOME/.claude/"
 run_spin "Syncing ~/.codex (skills, rules, keybindings, config)…" \
   rsync -a --ignore-existing "$REPO_DIR/configs/ai/codex/"  "$HOME/.codex/"
 ok "AI configs restored"
-info "Claude plugins must be re-installed after sign-in:"
+info "Claude plugins still need /plugin install after first run:"
 info "  /plugin install frontend-design@claude-plugins-official"
 info "  /plugin marketplace add warpdotdev/claude-code-warp"
 info "  /plugin install warp@claude-code-warp"
 
-step "6/8" "Pin Dock apps"
+# ─── Step 11: Pin Dock apps ──────────────────────────────────────
+step "11/14" "Pin Dock apps"
 if command -v dockutil >/dev/null 2>&1; then
   dockutil --no-restart --remove all >/dev/null 2>&1 || true
   for app in \
@@ -167,65 +248,81 @@ if command -v dockutil >/dev/null 2>&1; then
   fi
   ok "Dock pinned"
 else
-  warn "dockutil not found — skipping Dock pinning"
+  warn "dockutil not found — skipping"
 fi
 
-step "7/8" "macOS UI defaults"
+# ─── Step 12: macOS UI defaults ──────────────────────────────────
+step "12/14" "macOS UI defaults"
 run_spin "Applying Dock / Finder / keyboard / screenshots / Safari…" \
   bash "$REPO_DIR/macos.sh"
 ok "macOS defaults applied"
 
-step "8/8" "Agent review (optional)"
-if command -v claude >/dev/null 2>&1 && \
-   command -v gum >/dev/null 2>&1 && \
-   gum confirm "Run Claude Code to verify the setup?"; then
+# ─── Step 13: Permission grants (interactive) ────────────────────
+step "13/14" "Permission grants (interactive — each opens System Settings)"
+permission_grant() {
+  local pane_id="$1" pane_name="$2" reason="$3"
+  if ask_yes "Grant $pane_name now? ($reason)"; then
+    deep_link "x-apple.systempreferences:com.apple.preference.security?Privacy_$pane_id"
+    ask_yes "Done granting access in $pane_name?" || \
+      warn "$pane_name marked incomplete — revisit System Settings later"
+  else
+    info "Skipped $pane_name"
+  fi
+}
+permission_grant "Accessibility" "Accessibility" \
+  "needed by BetterTouchTool, superwhisper, TextSniper"
+permission_grant "ScreenCapture" "Screen Recording" \
+  "needed by TextSniper, Loopback if installed"
+permission_grant "ListenEvent"   "Input Monitoring" \
+  "needed by BetterTouchTool"
+permission_grant "AllFiles"      "Full Disk Access" \
+  "needed for Terminal so Safari prefs in macos.sh apply"
+
+# ─── Step 14: Agent review ───────────────────────────────────────
+step "14/14" "Agent review (optional)"
+if command -v claude >/dev/null 2>&1 && ask_yes "Run Claude Code to verify the setup end-to-end?"; then
   PROMPT="$(cat <<EOF
 You are reviewing a fresh-mac bootstrap that just ran. Verify the
-baseline from ~/mac-setup. Check and report ✓/⚠/✗ for each:
+baseline from $REPO_DIR. Check and report ✓/⚠/✗ for each:
 
 1. \`brew bundle check --file=$REPO_DIR/Brewfile\` — anything missing?
-2. ~/.claude exists with subdirs: settings.json, hooks, agents, skills.
-3. ~/.codex exists with: config.toml, skills, rules.
-4. Symlinks present and resolved: ~/.zshrc, ~/.gitconfig,
+2. \`brew bundle check --file=$REPO_DIR/Brewfile.appstore\` — App Store apps installed?
+3. ~/.claude exists with: settings.json, hooks/, agents/, skills/.
+4. ~/.codex exists with: config.toml, skills/, rules/.
+5. Dotfile symlinks resolved: ~/.zshrc, ~/.gitconfig,
    ~/.config/zed/settings.json, ~/.config/gh/config.yml.
-5. Dock has the expected apps in order (use \`defaults read com.apple.dock\`):
+6. Dock layout via \`defaults read com.apple.dock persistent-apps\`:
    1Password, Chrome, Music, Drafts, Warp, Discord.
-6. macOS defaults check: dock autohide on, finder shows hidden files,
-   screenshots saving to ~/Screenshots, dark mode on.
+7. macOS defaults: dock autohide on, finder shows hidden files,
+   screenshots dir is ~/Screenshots, dark mode on.
+8. AI CLI auth: \`claude auth status\` and similar for codex/droid.
 
-Output a markdown table with columns: Category | Status | Notes.
-End with a one-line summary: "Setup is X% complete."
+Output a markdown table: Category | Status | Notes.
+End with one line: "Setup is X% complete."
 EOF
 )"
   echo "$PROMPT" | claude --print 2>&1 || warn "claude review failed (may need re-auth)"
 else
-  info "Skipping agent review (claude not available or declined)"
+  info "Skipped agent review"
 fi
 
-# ─── Summary ────────────────────────────────────────────────────
+# ─── Summary ─────────────────────────────────────────────────────
 if command -v gum >/dev/null 2>&1; then
   gum style --border rounded --margin "1 2" --padding "1 3" \
     --border-foreground 42 --foreground 42 \
     "✅ Bootstrap complete"
 fi
 
-cat <<'EOF'
+cat <<EOF
 
-Manual sign-ins still needed (cloud-synced apps):
-  • Apple ID / iCloud           (System Settings)
-  • 1Password                   — restores passwords + SSH keys
+What still needs sign-in / cloud sync (no automation possible):
   • VS Code Settings Sync       — GitHub login from inside Code
-  • BetterTouchTool             — account sync or local preset
-  • Tailscale, Paste, Discord, Docker Desktop, Obsidian
-  • Claude Code / droid / cursor-agent / codex — re-auth each CLI
+  • BetterTouchTool             — account sync or restore local preset
+  • Tailscale, Paste, Discord, Docker Desktop, Obsidian            — sign-in
+  • Touch ID enrollment, Wi-Fi passwords, Bluetooth pairings       — System Settings
 
-Permission grants (System Settings → Privacy & Security):
-  • Accessibility       — BetterTouchTool, superwhisper, TextSniper
-  • Screen Recording    — TextSniper, Loopback (if used)
-  • Input Monitoring    — BetterTouchTool
-  • Full Disk Access    — Terminal (so Safari prefs in macos.sh apply)
-
-Maintenance:
+Maintenance later:
   brew update && brew upgrade
-  brew bundle check --file=~/mac-setup/Brewfile
+  brew bundle check --file=$REPO_DIR/Brewfile
+  brew bundle check --file=$REPO_DIR/Brewfile.appstore
 EOF
