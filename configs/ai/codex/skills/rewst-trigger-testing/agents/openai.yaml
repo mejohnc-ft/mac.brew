@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rewst Trigger Testing"
+  short_description: "Test live Rewst trigger paths"
+  default_prompt: "Use $rewst-trigger-testing to verify cron, form, or webhook trigger behavior through Rewst trigger-aware test paths and execution inspection."

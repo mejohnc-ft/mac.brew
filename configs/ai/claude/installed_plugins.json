@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "plugins": {
+    "frontend-design@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/jchristensen/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-17T09:16:58.091Z",
+        "lastUpdated": "2026-04-17T09:16:58.091Z"
+      }
+    ],
+    "warp@claude-code-warp": [
+      {
+        "scope": "user",
+        "installPath": "/Users/jchristensen/.claude/plugins/cache/claude-code-warp/warp/2.0.0",
+        "version": "2.0.0",
+        "installedAt": "2026-05-15T05:21:05.904Z",
+        "lastUpdated": "2026-05-15T05:21:05.904Z",
+        "gitCommitSha": "b8ad3cc6c1e40b2d2a944f900a4ae0904a54dd7f"
+      }
+    ]
+  }
+}

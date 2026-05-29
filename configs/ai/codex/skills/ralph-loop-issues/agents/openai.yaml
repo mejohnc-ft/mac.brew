@@ -1,0 +1,3 @@
+interface:
+  display_name: "Ralph Loop Issues"
+  short_description: "Chunk issue backlogs into bounded dispatch cycles with continuity across rounds."

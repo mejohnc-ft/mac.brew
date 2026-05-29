@@ -1,0 +1,12 @@
+name: review-team
+description: Multi-perspective code review
+composition:
+  - role: security
+    provider: claude
+    model: opus
+  - role: quality
+    provider: codex
+    model: gpt-4o
+  - role: context
+    provider: gemini
+    model: gemini-2.5-pro

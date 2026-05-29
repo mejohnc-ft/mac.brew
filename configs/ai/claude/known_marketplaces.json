@@ -1,0 +1,18 @@
+{
+  "claude-plugins-official": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    "installLocation": "/Users/jchristensen/.claude/plugins/marketplaces/claude-plugins-official",
+    "lastUpdated": "2026-05-29T04:43:22.705Z"
+  },
+  "claude-code-warp": {
+    "source": {
+      "source": "github",
+      "repo": "warpdotdev/claude-code-warp"
+    },
+    "installLocation": "/Users/jchristensen/.claude/plugins/marketplaces/claude-code-warp",
+    "lastUpdated": "2026-05-15T05:21:05.670Z"
+  }
+}

@@ -14,15 +14,18 @@ gh repo clone mejohnc-ft/mac.brew ~/mac-setup
 bash ~/mac-setup/bootstrap.sh
 ```
 
-`bootstrap.sh` runs in six steps:
+`bootstrap.sh` runs in seven steps:
 1. Install Homebrew
 2. `brew bundle` — formulae, casks, App Store apps (via `mas`)
 3. Vendor AI CLIs — Claude Code, Factory `droid`, Cursor, `uv`; symlink
    OpenAI Codex from `Codex.app` onto PATH
 4. Symlink dotfiles from `configs/` into `$HOME` (`.zshrc`, `.gitconfig`,
    `.config/zed/settings.json`, `.config/gh/config.yml`)
-5. Pin Dock apps with `dockutil`
-6. Apply macOS UI/UX defaults
+5. Restore AI tool configs — `~/.claude` and `~/.codex` populated from
+   `configs/ai/` (settings, hooks, agents, skills, codex rules). Uses
+   `rsync --ignore-existing` so local edits are never overwritten on re-runs.
+6. Pin Dock apps with `dockutil`
+7. Apply macOS UI/UX defaults
 
 ## Files
 
@@ -31,7 +34,9 @@ bash ~/mac-setup/bootstrap.sh
 | `Brewfile` | Formulae, casks, `mas` App Store entries, `dockutil` |
 | `bootstrap.sh` | One-shot installer |
 | `macos.sh` | macOS UI/UX defaults (Dock, Finder, hot corners, trackpad, keyboard, screenshots, Safari, animations, sound) |
-| `configs/` | Safe dotfiles only — never contains tokens or secrets |
+| `configs/` | Safe dotfiles + AI tool configs — never contains tokens or secrets |
+| `configs/ai/claude/` | Claude Code settings, hooks, agents, skills, plugin manifest |
+| `configs/ai/codex/` | Codex config (sanitized), keybindings, rules, skills |
 
 ## Manual sign-ins after bootstrap
 
@@ -72,8 +77,12 @@ The following are **never** committed:
 
 - `~/.config/gh/hosts.yml` (GitHub auth token)
 - `~/.config/franklin/edge-brain-ingest.env` (.env with secrets)
-- `~/.claude/`, `~/.codex/`, `~/.factory/`, `~/.cursor/` (session tokens,
-  conversation history)
+- `~/.claude/`, `~/.codex/`, `~/.factory/`, `~/.cursor/` **state** (session
+  tokens, history, sqlite logs, sessions, telemetry, plugin caches).
+  Only the **declarative** parts are committed under `configs/ai/`:
+  settings.json, hooks, agents, skills, rules, plugin manifests.
+- `~/.codex/config.toml` work `[projects.*]` sections (paths stripped
+  before commit; only personal / generic paths preserved)
 - SSH private keys (`~/.ssh/id_*`)
 - Anything under work-flagged directories (`DefensX`, work-managed configs)
 

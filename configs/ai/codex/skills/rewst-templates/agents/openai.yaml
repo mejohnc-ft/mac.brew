@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rewst Templates"
+  short_description: "Edit Rewst report templates"
+  default_prompt: "Use $rewst-templates to inspect or update a Rewst HTML template, validate body markers, and keep report layout changes safe."

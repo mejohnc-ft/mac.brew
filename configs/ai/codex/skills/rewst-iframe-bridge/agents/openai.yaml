@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rewst Iframe Bridge"
+  short_description: "Embed Rewst pages with live theme sync."
+  default_prompt: "Use the Rewst iframe bridge pattern to compose app pages with srcdoc embedding, live theme bridging, embedded chrome suppression, and standalone full-page fallback."

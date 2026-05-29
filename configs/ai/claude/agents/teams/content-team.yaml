@@ -1,0 +1,12 @@
+name: content-team
+description: Multi-language content creation
+composition:
+  - role: writer
+    provider: claude
+    model: opus
+  - role: localizer
+    provider: zhipu
+    model: glm-4.7
+  - role: reviewer
+    provider: gemini
+    model: gemini-2.5-pro

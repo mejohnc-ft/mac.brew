@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rewst Execution Debugging"
+  short_description: "Debug Rewst runs and task logs"
+  default_prompt: "Use $rewst-execution-debugging to inspect Rewst execution context, task logs, failures, fanout, and recipient resolution after a workflow run."

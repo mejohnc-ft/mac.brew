@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rewst Workflows"
+  short_description: "Operate and test Rewst workflows"
+  default_prompt: "Use $rewst-workflows to inspect, edit, publish, or test a Rewst workflow through the live GraphQL and trigger paths."

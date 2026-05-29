@@ -13,16 +13,16 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "▶ Step 1/6 — Homebrew"
+echo "▶ Step 1/7 — Homebrew"
 if ! command -v brew >/dev/null 2>&1; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-echo "▶ Step 2/6 — brew bundle (formulae, casks, App Store)"
+echo "▶ Step 2/7 — brew bundle (formulae, casks, App Store)"
 brew bundle --file="$REPO_DIR/Brewfile"
 
-echo "▶ Step 3/6 — Vendor AI CLIs"
+echo "▶ Step 3/7 — Vendor AI CLIs"
 mkdir -p "$HOME/.local/bin"
 
 if ! command -v claude >/dev/null 2>&1; then
@@ -45,7 +45,7 @@ if [ -x "$CODEX_APP" ] && [ ! -e "$HOME/.local/bin/codex" ]; then
   echo "  ✓ linked Codex CLI from Codex.app"
 fi
 
-echo "▶ Step 4/6 — Symlink personal dotfiles"
+echo "▶ Step 4/7 — Symlink personal dotfiles"
 # Each pair: source-in-repo → target-on-disk.
 # Existing files are backed up to *.bak before being replaced.
 link_config() {
@@ -64,7 +64,19 @@ link_config "$REPO_DIR/configs/gitconfig"         "$HOME/.gitconfig"
 link_config "$REPO_DIR/configs/zed/settings.json" "$HOME/.config/zed/settings.json"
 link_config "$REPO_DIR/configs/gh/config.yml"     "$HOME/.config/gh/config.yml"
 
-echo "▶ Step 5/6 — Pin Dock apps"
+echo "▶ Step 5/7 — Restore AI tool configs (Claude Code, Codex)"
+mkdir -p "$HOME/.claude" "$HOME/.codex"
+# --ignore-existing: never overwrite local edits; only fill in missing files
+rsync -a --ignore-existing "$REPO_DIR/configs/ai/claude/" "$HOME/.claude/"
+rsync -a --ignore-existing "$REPO_DIR/configs/ai/codex/"  "$HOME/.codex/"
+echo "  ✓ ~/.claude and ~/.codex populated (missing files filled, edits preserved)"
+echo "  ⓘ Claude plugins listed in installed_plugins.json must be re-installed"
+echo "    via Claude Code after sign-in:"
+echo "      /plugin install frontend-design@claude-plugins-official"
+echo "      /plugin marketplace add warpdotdev/claude-code-warp"
+echo "      /plugin install warp@claude-code-warp"
+
+echo "▶ Step 6/7 — Pin Dock apps"
 if command -v dockutil >/dev/null 2>&1; then
   dockutil --no-restart --remove all >/dev/null 2>&1 || true
   for app in \
@@ -87,7 +99,7 @@ else
   echo "  ⚠ dockutil not found — skipping Dock pinning"
 fi
 
-echo "▶ Step 6/6 — macOS defaults"
+echo "▶ Step 7/7 — macOS defaults"
 bash "$REPO_DIR/macos.sh"
 
 echo ""

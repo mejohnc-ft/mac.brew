@@ -1,0 +1,16 @@
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+approvals_reviewer = "user"
+
+
+notify = ["/Users/jchristensen/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+
+[features]
+goals = true
+
+# Project trust list — work paths intentionally excluded
+
+[projects."/Users/jchristensen"]
+trust_level = "trusted"
+

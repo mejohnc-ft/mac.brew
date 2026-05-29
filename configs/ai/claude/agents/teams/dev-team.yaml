@@ -1,0 +1,19 @@
+name: dev-team
+description: Full-stack development with multi-model specialists
+composition:
+  - role: architect
+    provider: claude
+    model: opus
+    use_for: Architecture, complex reasoning, planning
+  - role: coder
+    provider: codex
+    model: gpt-4o
+    use_for: Fast code implementation
+  - role: reviewer
+    provider: gemini
+    model: gemini-2.5-pro
+    use_for: Long context code review
+  - role: tester
+    provider: minimax
+    model: m2.1
+    use_for: Quick test generation

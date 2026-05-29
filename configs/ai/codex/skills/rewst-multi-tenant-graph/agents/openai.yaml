@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rewst Multi-Tenant Graph"
+  short_description: "Rewst child-org Graph auth workflow guide"
+  default_prompt: "Use $rewst-multi-tenant-graph to inspect and harden this Rewst workflow for child-org Microsoft Graph execution."

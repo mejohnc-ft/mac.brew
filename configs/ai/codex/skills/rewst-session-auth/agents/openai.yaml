@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rewst Session Auth"
+  short_description: "Stabilize Rewst browser session auth"
+  default_prompt: "Use this skill when Rewst terminal helpers need a valid browser session cookie or a reusable REWST_COOKIE export."

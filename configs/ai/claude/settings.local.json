@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(brew install:*)",
+      "Bash(git clone:*)",
+      "Bash(cat:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker compose:*)",
+      "Bash(psql:*)",
+      "Bash(brew list:*)",
+      "Bash(/opt/homebrew/bin/brew:*)",
+      "Bash(/usr/local/bin/brew:*)",
+      "Bash(/opt/homebrew/opt/postgresql@16/bin/createdb centrexai)",
+      "Bash(npm install)",
+      "Bash(npm run build:*)",
+      "Bash(npm run migrate:*)",
+      "Bash(npm run seed:*)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)"
+    ]
+  }
+}
