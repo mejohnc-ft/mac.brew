@@ -13,17 +13,17 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "▶ Step 1/3 — Homebrew"
+echo "▶ Step 1/4 — Homebrew"
 if ! command -v brew >/dev/null 2>&1; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   # Add brew to PATH for this session (Apple Silicon path)
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-echo "▶ Step 2/3 — brew bundle (formulae, casks, App Store)"
+echo "▶ Step 2/4 — brew bundle (formulae, casks, App Store)"
 brew bundle --file="$REPO_DIR/Brewfile"
 
-echo "▶ Step 3/3 — Vendor AI CLIs"
+echo "▶ Step 3/4 — Vendor AI CLIs"
 mkdir -p "$HOME/.local/bin"
 
 # Claude Code (Anthropic)
@@ -53,6 +53,9 @@ if [ -x "$CODEX_APP" ] && [ ! -e "$HOME/.local/bin/codex" ]; then
   ln -s "$CODEX_APP" "$HOME/.local/bin/codex"
   echo "  ✓ linked Codex CLI from Codex.app"
 fi
+
+echo "▶ Step 4/4 — macOS defaults"
+bash "$REPO_DIR/macos.sh"
 
 echo ""
 echo "✅ Bootstrap complete."

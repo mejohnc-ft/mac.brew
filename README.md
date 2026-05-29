@@ -27,6 +27,7 @@ bash ~/mac-setup/bootstrap.sh
 |---|---|
 | `Brewfile` | Formulae, casks, and `mas` App Store entries |
 | `bootstrap.sh` | One-shot installer including vendor AI CLIs |
+| `macos.sh` | macOS UI/UX defaults (Dock, Finder, hot corners, trackpad, etc.) |
 
 ## Maintenance
 
