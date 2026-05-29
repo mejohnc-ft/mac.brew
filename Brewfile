@@ -32,6 +32,9 @@ brew "mas"
 # Dock layout
 brew "dockutil"
 
+# TUI toolkit (used by bootstrap.sh)
+brew "gum"
+
 # ─── Casks ──────────────────────────────────
 # Productivity / utilities
 cask "1password"

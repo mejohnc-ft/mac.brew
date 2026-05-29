@@ -14,18 +14,20 @@ gh repo clone mejohnc-ft/mac.brew ~/mac-setup
 bash ~/mac-setup/bootstrap.sh
 ```
 
-`bootstrap.sh` runs in seven steps:
+`bootstrap.sh` runs in eight steps, styled with [`gum`](https://github.com/charmbracelet/gum):
 1. Install Homebrew
-2. `brew bundle` — formulae, casks, App Store apps (via `mas`)
+2. `brew bundle` — formulae, casks, App Store apps (via `mas`), `gum`,
+   `dockutil`
 3. Vendor AI CLIs — Claude Code, Factory `droid`, Cursor, `uv`; symlink
    OpenAI Codex from `Codex.app` onto PATH
-4. Symlink dotfiles from `configs/` into `$HOME` (`.zshrc`, `.gitconfig`,
-   `.config/zed/settings.json`, `.config/gh/config.yml`)
+4. Symlink dotfiles from `configs/` into `$HOME`
 5. Restore AI tool configs — `~/.claude` and `~/.codex` populated from
-   `configs/ai/` (settings, hooks, agents, skills, codex rules). Uses
-   `rsync --ignore-existing` so local edits are never overwritten on re-runs.
+   `configs/ai/` with `rsync --ignore-existing`
 6. Pin Dock apps with `dockutil`
 7. Apply macOS UI/UX defaults
+8. **Agent review (optional)** — `gum confirm` offers to run Claude Code,
+   which verifies brew bundle status, AI config presence, Dock layout,
+   and key macOS defaults, then prints a markdown ✓/⚠/✗ report.
 
 ## Files
 
