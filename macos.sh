@@ -68,6 +68,11 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeF
 defaults write -g com.apple.mouse.tapBehavior -int 1
 defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 
+# Scroll direction — applies to BOTH trackpad and mouse (global setting).
+# false = traditional/inverted (content moves opposite to finger, "Windows style")
+# true  = natural (content moves with finger, macOS default since Lion)
+defaults write -g com.apple.swipescrolldirection -bool false
+
 # ─── (C) Screenshots ──────────────────────────────────────────────
 mkdir -p "$HOME/Screenshots"
 defaults write com.apple.screencapture location -string "$HOME/Screenshots"
