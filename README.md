@@ -49,7 +49,8 @@ bash ~/mac-setup/bootstrap.sh
 | `Brewfile` | Formulae + casks (no App Store apps). PowerShell is a formula, not cask. TinkerTool is a manual download from bresink.com (not in Homebrew). |
 | `Brewfile.appstore` | App Store apps — installed conditionally on Apple ID sign-in |
 | `bootstrap.sh` | One-shot installer, 14 steps |
-| `macos.sh` | macOS UI/UX defaults (Dock, Finder, hot corners, trackpad, keyboard, screenshots, Safari, animations, sound) |
+| `macos.sh` | macOS UI/UX defaults (Dock, Finder, hot corners, trackpad, keyboard, screenshots, Safari, animations, sound) — sudo-free |
+| `power.sh` | Liberal `pmset` sleep settings (Moderate preset) — runs after sudo is cached in bootstrap step 3 |
 | `configs/` | Safe dotfiles + AI tool configs — never contains tokens or secrets |
 | `configs/ai/claude/` | Claude Code settings, hooks, agents, skills, plugin manifest |
 | `configs/ai/codex/` | Codex config (sanitized), keybindings, rules, skills |

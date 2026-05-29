@@ -114,6 +114,9 @@ defaults write -g com.apple.sound.beep.feedback -int 0   # no beep on volume cha
 defaults write -g com.apple.sound.uiaudio.enabled -int 0 # disable UI sound effects
 
 # ─── Restart affected apps so changes take effect ────────────────
+# cfprefsd is the prefs daemon — needs a kick to re-read on macOS 13+
+# so trackpad/keyboard prefs (esp. three-finger drag) actually engage.
+killall cfprefsd >/dev/null 2>&1 || true
 for app in Dock Finder SystemUIServer; do
   killall "$app" >/dev/null 2>&1 || true
 done
@@ -127,3 +130,5 @@ echo "    to apps that need it (BetterTouchTool, superwhisper, etc.)"
 echo "  • Touch ID enrollment, Wi-Fi passwords, Bluetooth pairings"
 echo "  • If Safari prefs didn't apply, grant Full Disk Access to Terminal"
 echo "    and re-run macos.sh, or toggle them in Safari → Settings"
+echo "  • Three-finger drag may need a logout / login to engage on"
+echo "    macOS 13+ (Accessibility framework reads it lazily)."
