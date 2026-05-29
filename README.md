@@ -44,7 +44,7 @@ bash ~/mac-setup/bootstrap.sh
 
 | File | Purpose |
 |---|---|
-| `Brewfile` | Formulae + casks (no App Store apps) |
+| `Brewfile` | Formulae + casks (no App Store apps). PowerShell is a formula, not cask. TinkerTool is a manual download from bresink.com (not in Homebrew). |
 | `Brewfile.appstore` | App Store apps — installed conditionally on Apple ID sign-in |
 | `bootstrap.sh` | One-shot installer, 14 steps |
 | `macos.sh` | macOS UI/UX defaults (Dock, Finder, hot corners, trackpad, keyboard, screenshots, Safari, animations, sound) |
@@ -103,6 +103,8 @@ The following are **never** committed:
 
 ## Caveats
 
+- **TinkerTool** is freeware from bresink.com, not in Homebrew. Download
+  manually from <https://www.bresink.com/osx/TinkerTool.html>.
 - **App Store sign-in is manual** — `mas` can install only apps your Apple
   ID already owns.
 - **AI CLI install URLs can change** — if a `curl | sh` line in

@@ -87,8 +87,36 @@ ok "Homebrew ready"
 
 # ─── Step 3: brew bundle (no App Store apps yet) ─────────────────
 step "3/14" "brew bundle — formulae + casks (no App Store apps yet)"
-brew bundle --file="$REPO_DIR/Brewfile"
-ok "Core packages installed (gum, 1Password, dockutil, AI casks, …)"
+
+# Cache sudo so cask PKG installers (Docker, Tailscale, Rogue Amoeba apps)
+# don't prompt repeatedly during the next few minutes.
+if sudo -n true 2>/dev/null; then
+  info "sudo already cached"
+else
+  echo "  → caching sudo for the next ~15 min (one password prompt)…"
+  sudo -v
+fi
+# Background keepalive: refresh sudo timestamp every minute while the
+# script runs. Auto-exits when the parent process exits.
+( while true; do sudo -n true; sleep 60; kill -0 $$ 2>/dev/null || exit; done ) >/dev/null 2>&1 &
+SUDO_KEEPER_PID=$!
+# shellcheck disable=SC2064
+trap "kill $SUDO_KEEPER_PID 2>/dev/null || true" EXIT
+ok "sudo cached (background keepalive PID $SUDO_KEEPER_PID)"
+
+# Run brew bundle tolerantly — partial failures (network blips, renamed
+# casks, etc.) should NOT kill the rest of bootstrap.
+if brew bundle --file="$REPO_DIR/Brewfile"; then
+  ok "All core packages installed"
+else
+  warn "Some packages failed to install"
+  echo
+  echo "  Missing packages:"
+  brew bundle check --verbose --file="$REPO_DIR/Brewfile" 2>&1 | sed 's/^/    /' || true
+  echo
+  info "Continuing to next step. Retry later with:"
+  info "  brew bundle --file=$REPO_DIR/Brewfile"
+fi
 
 # ─── Step 4: Apple ID sign-in ────────────────────────────────────
 step "4/14" "Apple ID sign-in"
@@ -120,9 +148,12 @@ if [ "$APPLE_OK" -eq 1 ]; then
   fi
 
   if [ "$APPLE_OK" -eq 1 ]; then
-    brew bundle --file="$REPO_DIR/Brewfile.appstore" || \
+    if brew bundle --file="$REPO_DIR/Brewfile.appstore"; then
+      ok "App Store apps installed"
+    else
       warn "Some App Store installs failed (re-run later if needed)"
-    ok "App Store apps installed"
+      brew bundle check --verbose --file="$REPO_DIR/Brewfile.appstore" 2>&1 | sed 's/^/    /' || true
+    fi
   fi
 else
   info "Skipping App Store apps. Run later when ready:"

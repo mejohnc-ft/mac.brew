@@ -46,7 +46,8 @@ cask "1password-cli"
 cask "appcleaner"
 cask "bettertouchtool"
 cask "obsidian"
-cask "tinker-tool"
+# TinkerTool is freeware from bresink.com — not in Homebrew.
+# Manual download: https://www.bresink.com/osx/TinkerTool.html
 
 # Audio (Rogue Amoeba)
 cask "audio-hijack"
@@ -60,7 +61,7 @@ cask "discord"
 # Dev
 cask "visual-studio-code"
 cask "docker-desktop"
-cask "powershell"
+brew "powershell"   # formula, not cask
 cask "warp"
 
 # Networking
