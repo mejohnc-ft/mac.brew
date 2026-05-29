@@ -26,6 +26,9 @@ brew "postgresql@16"
 brew "postgresql@18"
 brew "supabase/tap/supabase"
 
+# App Store CLI
+brew "mas"
+
 # ─── Casks ──────────────────────────────────
 # Productivity / utilities
 cask "1password"
@@ -53,3 +56,16 @@ cask "tailscale-app"
 
 # Dictation
 cask "superwhisper"
+
+# ─── App Store (requires manual sign-in first) ──
+mas "Dark Reader for Safari", id: 1438243180
+mas "Drafts",                 id: 1435957248
+mas "Infuse",                 id: 1136220934
+mas "Keynote",                id: 409183694
+mas "Numbers",                id: 409203825
+mas "Pages",                  id: 409201541
+mas "Paste",                  id: 967805235
+mas "PCalc",                  id: 403504866
+mas "Pixelmator Pro",         id: 1289583905
+mas "Reeder",                 id: 6475002485
+mas "TextSniper",             id: 1528890965
